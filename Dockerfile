@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 设置 Nginx 版本和目录
-ARG NGINX_VERSION=1.25.3
+ARG NGINX_VERSION=1.30.3
 WORKDIR /src
 
 # 下载 Nginx 源码
