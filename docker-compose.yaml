@@ -1,0 +1,10 @@
+services:
+  web:
+    image: ghcr.io/apumaatlarge/webdav-in-dsm:latest
+    container_name: auto-nginx
+    ports:
+      - "44433:80"
+    volumes:
+      - /volume4/hard/data:/var/www/data
+      - /volume4/hard/nginx/nginx.conf:/etc/nginx/nginx.conf
+      
