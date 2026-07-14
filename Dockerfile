@@ -42,7 +42,16 @@ RUN cd nginx-${NGINX_VERSION} \
     && make \
     && make install
 
-# 阶段 2: 运行阶段
+# 阶段 2: 编译 Go 接口
+FROM golang:1.22-bullseye AS go-builder
+
+WORKDIR /src
+COPY go.mod ./
+COPY cmd ./cmd
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/link-api ./cmd/link-api
+
+# 阶段 3: 运行阶段
 FROM debian:bullseye-slim
 
 # 安装运行所需的库
@@ -64,6 +73,7 @@ RUN useradd \
 # 从构建阶段复制编译好的 Nginx 二进制文件
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /etc/nginx /etc/nginx
+COPY --from=go-builder /out/link-api /usr/local/bin/link-api
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY .htpasswd /etc/nginx/.htpasswd
 
@@ -77,6 +87,6 @@ RUN  mkdir -p /var/www/data /var/log/nginx /var/run \
 # 暴露端口
 EXPOSE 80
 
-# 启动 Nginx
+# 启动 Go 接口和 Nginx
 ENTRYPOINT ["/bin/sh", "-c", "chmod -R 777 /var/www/data /var/log/nginx; exec \"$@\"", "--"]
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/bin/sh", "-c", "ADDR=127.0.0.1:8080 /usr/local/bin/link-api & exec nginx -g 'daemon off;'"]
