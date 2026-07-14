@@ -47,3 +47,67 @@ The API creates an absolute symlink at `dist/name` that points to `src`. For
 nginx to serve it, `src` and `dist` must both be visible in the nginx container
 or host namespace, and the nginx worker user must have permission to traverse
 and read the target path.
+
+### Link API Reference
+
+Endpoint:
+
+```text
+POST /link-api/symlink
+```
+
+Request body:
+
+```json
+{
+  "src": "/var/www/data/BVID",
+  "dist": "/var/www/data/trash",
+  "name": "BVID"
+}
+```
+
+Fields:
+
+- `src`: required. Source file or directory path inside the container.
+- `dist`: required. Destination directory path inside the container. It is
+  created when it does not exist.
+- `name`: optional. Symlink name under `dist`. When omitted, the API uses the
+  base name of `src`.
+
+The API returns `201 Created` when the symlink is created:
+
+```json
+{
+  "link": "/var/www/data/trash/BVID",
+  "src": "/var/www/data/BVID"
+}
+```
+
+Create a symlink for a folder:
+
+```bash
+curl -X POST 'http://10.0.0.137:44433/link-api/symlink' \
+  -u "$BASIC_AUTH_USER:$BASIC_AUTH_PASSWORD" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "src": "/var/www/data/BVID",
+    "dist": "/var/www/data/trash",
+    "name": "BVID"
+  }'
+```
+
+Create a symlink for a file:
+
+```bash
+curl -X POST 'http://10.0.0.137:44433/link-api/symlink' \
+  -u "$BASIC_AUTH_USER:$BASIC_AUTH_PASSWORD" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "src": "/var/www/data/BVID/3 分钟修复 Flex 布局的常见问题-1-BV1vRaCz7EJ1.mp4",
+    "dist": "/var/www/data/trash"
+  }'
+```
+
+URL paths are not filesystem paths. With the current nginx `alias
+/var/www/data/`, a browser URL like `/BVID/example.mp4` maps to
+`/var/www/data/BVID/example.mp4` inside the container.
