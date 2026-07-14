@@ -64,11 +64,15 @@ RUN useradd \
 # 从构建阶段复制编译好的 Nginx 二进制文件
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /etc/nginx /etc/nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY .htpasswd /etc/nginx/.htpasswd
 
 
 # 创建必要的目录和权限
 RUN  mkdir -p /var/www/data /var/log/nginx /var/run \
-    && chown -R 1111:100 /var/www/data /var/log/nginx
+    && chown -R 1111:100 /var/www/data /var/log/nginx \
+    && chown 1111:100 /etc/nginx/.htpasswd \
+    && chmod 640 /etc/nginx/.htpasswd
 
 # 暴露端口
 EXPOSE 80

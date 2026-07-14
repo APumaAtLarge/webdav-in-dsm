@@ -7,11 +7,13 @@ on:
     paths:
       - Dockerfile
       - nginx.conf
+      - scripts/generate-htpasswd.sh
       - .github/workflows/docker-image.yml
   pull_request:
     paths:
       - Dockerfile
       - nginx.conf
+      - scripts/generate-htpasswd.sh
       - .github/workflows/docker-image.yml
   workflow_dispatch:
 
@@ -36,6 +38,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Generate basic auth password file
+        run: sh scripts/generate-htpasswd.sh
+        env:
+          BASIC_AUTH_USER: ${{ github.event_name == 'pull_request' && 'ci' || secrets.BASIC_AUTH_USER }}
+          BASIC_AUTH_PASSWORD: ${{ github.event_name == 'pull_request' && 'ci' || secrets.BASIC_AUTH_PASSWORD }}
 
       - name: Log in to GHCR
         if: github.event_name != 'pull_request'
