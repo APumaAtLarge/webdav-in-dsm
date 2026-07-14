@@ -27,7 +27,6 @@ env:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    environment: ABC
 
     steps:
       - name: Checkout
