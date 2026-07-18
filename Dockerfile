@@ -76,17 +76,19 @@ COPY --from=builder /etc/nginx /etc/nginx
 COPY --from=go-builder /out/link-api /usr/local/bin/link-api
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY .htpasswd /etc/nginx/.htpasswd
+COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 
 # 创建必要的目录和权限
 RUN  mkdir -p /var/www/data /var/log/nginx /var/run \
     && chown -R 1111:100 /var/www/data /var/log/nginx \
     && chown 1111:100 /etc/nginx/.htpasswd \
-    && chmod 640 /etc/nginx/.htpasswd
+    && chmod 640 /etc/nginx/.htpasswd \
+    && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # 暴露端口
 EXPOSE 80
 
 # 启动 Go 接口和 Nginx
-ENTRYPOINT ["/bin/sh", "-c", "chmod -R 777 /var/www/data /var/log/nginx; exec \"$@\"", "--"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["/bin/sh", "-c", "ADDR=127.0.0.1:8080 /usr/local/bin/link-api & exec nginx -g 'daemon off;'"]
