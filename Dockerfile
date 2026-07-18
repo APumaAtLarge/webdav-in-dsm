@@ -47,9 +47,9 @@ FROM golang:1.22-bullseye AS go-builder
 
 WORKDIR /src
 COPY go.mod ./
-COPY cmd ./cmd
+COPY src ./src
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/link-api ./cmd/link-api
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/link-api ./src
 
 # 阶段 3: 运行阶段
 FROM debian:bullseye-slim

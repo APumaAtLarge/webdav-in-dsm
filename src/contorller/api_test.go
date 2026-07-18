@@ -1,4 +1,4 @@
-package main
+package contorller
 
 import (
 	"io/ioutil"

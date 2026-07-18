@@ -33,11 +33,11 @@ BASIC_AUTH_USER=admin BASIC_AUTH_PASSWORD=password1 sh scripts/generate-htpasswd
 
 ## Link API
 
-`cmd/link-api` provides a small Go HTTP API for creating links under a WebDAV
+`src` provides a small Go HTTP API for creating links under a WebDAV
 directory:
 
 ```bash
-go run ./cmd/link-api
+go run ./src
 curl -X POST http://127.0.0.1:8080/symlink \
   -H 'Content-Type: application/json' \
   -d '{"src":"/var/www/source/movie.mkv","dist":"/var/www/data","name":"movie.mkv"}'
